@@ -1,19 +1,13 @@
 name: Deploy Hasura to GKE Autopilot
 
 on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  workflow_dispatch:
     inputs:
-      project-id:
-        description: 'Google Cloud project ID'
-        required: 
-      repository:
-        description: 'Artifact Registry repository name'
+      title:
+        description: 'Title for the release'
+        required: false
+      description:
+        description: 'Description for the release'
         required: false
 
     steps:
