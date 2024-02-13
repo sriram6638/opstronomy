@@ -8,6 +8,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    inputs:
+      project-id:
+        description: 'Google Cloud project ID'
+        required: 
+      repository:
+        description: 'Artifact Registry repository name'
+        required: false
 
     steps:
     - name: Checkout code
