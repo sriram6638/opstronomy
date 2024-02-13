@@ -1,4 +1,3 @@
-
 name: Deploy Hasura to GKE Autopilot
 
 on:
@@ -10,29 +9,31 @@ on:
       description:
         description: 'Description for the release'
         required: false
+
 jobs:
-  build:
-    name: 'Build'
+  deploy:
+    name: 'Deploy Hasura'
     runs-on: ubuntu-latest
     
+    env:
+      GCP_CREDENTIALS_JSON: ${{ secrets.GCP_SA_KEY }}
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
     - name: Authenticate with GCP
-      uses: google-github-actions/auth@v1
-      with:
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
+      run: echo '${GCP_CREDENTIALS_JSON}' > key.json && gcloud auth activate-service-account --key-file=key.json
 
     - name: Configure Docker
       run: |
-        gcloud auth configure-docker
+        gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
 
     - name: Pull Hasura Docker image from Artifact Registry
       run: |
         docker pull asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine
+
     - name: Deploy Hasura to GKE Autopilot
       run: |
         gcloud container clusters get-credentials opstronomy --region asia-south1
         gcloud run deploy hasura --image=asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine --platform=managed --region=asia-south1 --allow-unauthenticated
-
