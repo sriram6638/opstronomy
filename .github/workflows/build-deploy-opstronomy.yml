@@ -1,39 +1,68 @@
-name: Deploy Hasura to GKE Autopilot
-
+name: 'Build and Deploy '
 on:
   workflow_dispatch:
     inputs:
       title:
         description: 'Title for the release'
         required: false
+      # version:
+      #   description: 'Version to release'
+      #   required: true
       description:
         description: 'Description for the release'
         required: false
 
 jobs:
-  deploy:
-    name: 'Deploy Hasura'
+  build:
+    name: 'Build'
     runs-on: ubuntu-latest
-    
-    env:
-      GCP_CREDENTIALS_JSON: ${{ secrets.GCP_SA_KEY }}
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: "Build:checkout"
+        uses: actions/checkout@v2
 
-    - name: Authenticate with GCP
-      run: echo '${GCP_CREDENTIALS_JSON}' > key.json && gcloud auth activate-service-account --key-file=key.json
+      - name: Setup GIT
+        run: |
+          git config --global user.name "github.actor"
 
-    - name: Configure Docker
-      run: |
-        gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
+      # - name: Bump version
+      #   id: updated_version
+      #   run: |
+      #     cd server
+      #     npm version patch
+      #     curr_version="$(node -p "require('./package.json').version")"
+      #     cd ..
+      #     git add -A
+      #     git commit -m $curr_version
+      #     git push https://${{secrets.GA_REPO_TOKEN}}@github.com/opstronomy/ops-chat-server
+      #     echo The version is $curr_version
+      #     echo "::set-output name=version::$curr_version"
 
-    - name: Pull Hasura Docker image from Artifact Registry
-      run: |
-        docker pull asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Deploy Hasura to GKE Autopilot
-      run: |
-        gcloud container clusters get-credentials opstronomy --region asia-south1
-        gcloud run deploy hasura --image=asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine --platform=managed --region=asia-south1 --allow-unauthenticated
+      # - name: "Publish to GHCR"
+      #   run: |
+      #     cd server
+      #     npm run-script publish:ghcr
+
+      - name: "Google auth"
+        id: "auth"
+        uses: "google-github-actions/auth@v1"
+        with:
+          service_account: "${{ secrets.WIF_SERVICE_ACCOUNT }}"
+          credentials_json: "${{ secrets.SERVICE_ACCOUNT_JSON }}"
+
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v1"
+        with:
+          project_id: "${{ secrets.PROJECT_ID }}"
+
+      - name: 'Docker auth'
+        run: |-
+          gcloud auth configure-docker ${{ secrets.GAR_LOCATION }}-docker.pkg.dev
+
+     
