@@ -65,4 +65,13 @@ jobs:
         run: |-
           gcloud auth configure-docker ${{ secrets.GAR_LOCATION }}-docker.pkg.dev
 
+      - name: Pull Docker image from Artifact Registry
+        run: |
+          gcloud auth list
+          gcloud auth activate-service-account --key-file=${{ secrets.GCP_SA_KEY }}
+          gcloud artifacts repositories docker pull asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine
+      - name: Deploy to GKE Autopilot
+        run: |
+          gcloud container clusters get-credentials opstronomy --region asia-south1
+          gcloud run deploy hasura --image aasia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine --platform managed --region asia-south1
      
