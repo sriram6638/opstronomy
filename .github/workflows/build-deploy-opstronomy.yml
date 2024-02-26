@@ -61,6 +61,12 @@ jobs:
         with:
           project_id: "${{ secrets.PROJECT_ID }}"
 
+      - name: Install gcloud SDK and kubectl
+        run: |
+          curl -sSL https://sdk.cloud.google.com | bash
+          exec -l $SHELL
+          gcloud components install kubectl    
+
       - name: 'Docker auth'
         run: |-
           gcloud auth configure-docker ${{ secrets.GAR_LOCATION }}-docker.pkg.dev --quiet
