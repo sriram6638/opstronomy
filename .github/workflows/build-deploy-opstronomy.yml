@@ -65,7 +65,10 @@ jobs:
         run: |
           curl -sSL https://sdk.cloud.google.com | bash
           exec -l $SHELL
-          gcloud components install kubectl    
+          gcloud components install kubectl 
+
+      - name: Enable Cloud Run API
+        run: gcloud services enable run.googleapis.com       
 
       - name: 'Docker auth'
         run: |-
