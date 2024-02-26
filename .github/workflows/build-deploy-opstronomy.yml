@@ -67,10 +67,10 @@ jobs:
 
       - name: Pull Docker image from Artifact Registry
         run: |
-          docker pull aasia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine
-          
+          docker pull asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine
+
       - name: Deploy to GKE Autopilot
         run: |
           gcloud container clusters get-credentials opstronomy --region asia-south1
-          gcloud run deploy hasura --image aasia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine --platform managed --region asia-south1
+          gcloud run deploy hasura --image asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine --platform managed --region asia-south1
      
