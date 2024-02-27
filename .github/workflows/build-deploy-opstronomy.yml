@@ -17,11 +17,15 @@ jobs:
       - name: "Checkout Repository"
         uses: actions/checkout@v2
 
+      - name: "Authenticate with Google Cloud"
+        uses: google-github-actions/auth@v1
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+
       - name: "Set up Cloud SDK"
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: "${{ secrets.PROJECT_ID }}"
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
 
       - name: "Configure kubectl"
         run: gcloud container clusters get-credentials opstronomy --region asia-south1 --quiet
