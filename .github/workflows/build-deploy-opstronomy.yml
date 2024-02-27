@@ -1,31 +1,71 @@
-name: 'Deploy to GKE Autopilot'
+name: 'Build and Deploy '
 on:
   workflow_dispatch:
     inputs:
       title:
         description: 'Title for the release'
         required: false
+      # version:
+      #   description: 'Version to release'
+      #   required: true
       description:
         description: 'Description for the release'
         required: false
 
 jobs:
-  deploy:
-    name: 'Deploy to GKE Autopilot'
+  build:
+    name: 'Build'
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout Repository"
+      - name: "Build:checkout"
         uses: actions/checkout@v2
 
-      - name: "Authenticate with Google Cloud"
-        uses: google-github-actions/auth@v1
+      - name: Setup GIT
+        run: |
+          git config --global user.name "github.actor"
+
+      # - name: Bump version
+      #   id: updated_version
+      #   run: |
+      #     cd server
+      #     npm version patch
+      #     curr_version="$(node -p "require('./package.json').version")"
+      #     cd ..
+      #     git add -A
+      #     git commit -m $curr_version
+      #     git push https://${{secrets.GA_REPO_TOKEN}}@github.com/opstronomy/ops-chat-server
+      #     echo The version is $curr_version
+      #     echo "::set-output name=version::$curr_version"
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: "Publish to GHCR"
+      #   run: |
+      #     cd server
+      #     npm run-script publish:ghcr
+
+      - name: "Google auth"
+        id: "auth"
+        uses: "google-github-actions/auth@v1"
+        with:
+          service_account: "${{ secrets.WIF_SERVICE_ACCOUNT }}"
+          credentials_json: "${{ secrets.SERVICE_ACCOUNT_JSON }}"
 
       - name: "Set up Cloud SDK"
-        uses: google-github-actions/setup-gcloud@v1
+        uses: "google-github-actions/setup-gcloud@v1"
         with:
           project_id: "${{ secrets.PROJECT_ID }}"
+
+      - name: Install gcloud SDK and kubectl
+        run: |
+          curl -sSL https://sdk.cloud.google.com | bash
+          exec -l $SHELL
+          gcloud components install kubectl     
 
       - name: "Configure kubectl"
         run: gcloud container clusters get-credentials opstronomy --region asia-south1 --quiet
@@ -36,3 +76,4 @@ jobs:
 
       - name: "Verify Deployment"
         run: kubectl rollout status deployment/hasura
+     
