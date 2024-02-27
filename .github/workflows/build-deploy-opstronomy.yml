@@ -65,7 +65,12 @@ jobs:
         run: |
           curl -sSL https://sdk.cloud.google.com | bash
           exec -l $SHELL
-          gcloud components install kubectl     
+          gcloud components install kubectl 
+
+      - name: "Install gke-gcloud-auth-plugin"
+        run: |
+          gcloud components install kubectl
+          gcloud components install gke-gcloud-auth-plugin       
 
       - name: "Configure kubectl"
         run: gcloud container clusters get-credentials opstronomy --region asia-south1 --quiet
