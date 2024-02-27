@@ -5,9 +5,6 @@ on:
       title:
         description: 'Title for the release'
         required: false
-      # version:
-      #   description: 'Version to release'
-      #   required: true
       description:
         description: 'Description for the release'
         required: false
@@ -24,6 +21,7 @@ jobs:
         run: |
           git config --global user.name "github.actor"
 
+      # Uncomment and modify this section if you want to bump the version
       # - name: Bump version
       #   id: updated_version
       #   run: |
@@ -44,6 +42,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Uncomment this section if you need to publish to GitHub Container Registry
       # - name: "Publish to GHCR"
       #   run: |
       #     cd server
@@ -67,18 +66,25 @@ jobs:
           exec -l $SHELL
           gcloud components install kubectl 
 
-      - name: "Install gke-gcloud-auth-plugin"
-        run: |
-          gcloud components install kubectl
-          gcloud components install gke-gcloud-auth-plugin       
+      # Install gke-gcloud-auth-plugin if needed
+      # - name: "Install gke-gcloud-auth-plugin"
+      #   run: |
+      #     gcloud components install kubectl
+      #     gcloud components install gke-gcloud-auth-plugin       
 
       - name: "Configure kubectl"
-        run: gcloud container clusters get-credentials opstronomy --region asia-south1 --quiet
+        run: |
+          gcloud container clusters get-credentials opstronomy --region asia-south1 --quiet
+          kubectl version --short
 
       - name: "Deploy to GKE Autopilot"
         run: |
+          # Add your deployment command here. Modify it according to your needs.
+          # Replace "hasura" with your deployment name and the image URL with your actual image.
           kubectl set image deployment/hasura hasura=asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine:latest
 
       - name: "Verify Deployment"
-        run: kubectl rollout status deployment/hasura
-     
+        run: |
+          # Add any verification steps here, such as checking the rollout status.
+          kubectl get deployments
+          kubectl rollout status deployment/hasura
