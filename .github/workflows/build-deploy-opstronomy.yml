@@ -5,9 +5,6 @@ on:
       title:
         description: 'Title for the release'
         required: false
-      # version:
-      #   description: 'Version to release'
-      #   required: true
       description:
         description: 'Description for the release'
         required: false
@@ -32,13 +29,12 @@ jobs:
         cluster_name: ${{ secrets.GCP_CLUSTER_NAME }}
         location: ${{ secrets.GCP_CLUSTER_REGION }}
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-
-    - name: Create ConfigMap
-      run: |
-       kubectl create configmap my-app-config --from-env-file=./config.env
      
-  
     - name: Deploy to GCP Kubernetes Autopilot
       run: |
-       kubectl create deployment my-app --image=${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REGISTRY_REPOSITORY }}/my-app:${{ github.sha }}
-       kubectl set env deployment/my-app --from=configmap/my-app-config
+        env_vars=""
+        for var_name in HASURA_GRAPHQL_METADATA_DATABASE_URL HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS HASURA_GRAPHQL_ENABLE_CONSOLE HASURA_GRAPHQL_ENABLED_LOG_TYPES HASURA_GRAPHQL_DEV_MODE
+        HASURA_GRAPHQL_ADMIN_SECRET        ; do  # Replace VAR1, VAR2, VAR3 with your actual secret names
+          env_vars="$env_vars --env=$var_name=${{ secrets[var_name] }}"
+        done
+        kubectl create deployment my-app --image=${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REGISTRY_REPOSITORY }}/my-app:${{ github.sha }} $env_vars
