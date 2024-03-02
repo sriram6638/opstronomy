@@ -32,9 +32,4 @@ jobs:
      
     - name: Deploy to GCP Kubernetes Autopilot
       run: |
-        env_vars=""
-        for var_name in HASURA_GRAPHQL_METADATA_DATABASE_URL HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS HASURA_GRAPHQL_ENABLE_CONSOLE HASURA_GRAPHQL_ENABLED_LOG_TYPES HASURA_GRAPHQL_DEV_MODE
-        HASURA_GRAPHQL_ADMIN_SECRET        ; do  # Replace VAR1, VAR2, VAR3 with your actual secret names
-          env_vars="$env_vars --env=$var_name=${{ secrets[var_name] }}"
-        done
-        kubectl create deployment my-app --image=${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REGISTRY_REPOSITORY }}/my-app:${{ github.sha }} $env_vars
+       kubectl create deployment my-app --image=${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REGISTRY_REPOSITORY }}/my-app:${{ github.sha }} --env=VAR1=${{ secrets.HASURA_GRAPHQL_ADMIN_SECRET }} --env=VAR2=${{ secrets.HASURA_GRAPHQL_DEV_MODE }} --env=VAR3=${{ secrets.HASURA_GRAPHQL_ENABLED_LOG_TYPES }} --env=VAR4=${{ secrets.HASURA_GRAPHQL_ENABLE_CONSOLE }} --env=VAR5=${{ secrets.HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS }} --env=VAR6=${{ secrets.HASURA_GRAPHQL_METADATA_DATABASE_URL }}  --env=VAR8=${{ secrets.PORT }}
