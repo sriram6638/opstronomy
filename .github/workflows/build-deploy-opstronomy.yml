@@ -26,10 +26,10 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 
-    - name: Deploy to GCP Kubernetes Autopilot
+    - name: Get GKE credentials
       run: |
-        gcloud container clusters get-credentials ${{ secrets.GCP_CLUSTER_NAME }} --region ${{ secrets.GCP_CLUSTER_REGION }} --project ${{ secrets.GCP_PROJECT_ID }}
-        gcloud container clusters update ${{ secrets.GCP_CLUSTER_NAME }} --update-addons=HttpLoadBalancing=ENABLED
-        gcloud container clusters update ${{ secrets.GCP_CLUSTER_NAME }} --region ${{ secrets.GCP_CLUSTER_REGION }} --project ${{ secrets.GCP_PROJECT_ID }} --image-type "COS_CONTAINERD"
-        gcloud container clusters update ${{ secrets.GCP_CLUSTER_NAME }} --region ${{ secrets.GCP_CLUSTER_REGION }} --project ${{ secrets.GCP_PROJECT_ID }} --enable-autoupgrade
-        gcloud container clusters update ${{ secrets.GCP_CLUSTER_NAME }} --region ${{ secrets.GCP_CLUSTER_REGION }} --project ${{ secrets.GCP_PROJECT_ID }} --enable-autorepair
+       gcloud container clusters get-credentials ${{ secrets.GCP_CLUSTER_NAME }} --region ${{ secrets.GCP_CLUSTER_REGION }}
+  
+    - name: Deploy to GKE
+      run: |
+       kubectl create deployment my-app --image=${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REGISTRY_REPOSITORY }}/my-app:${{ github.sha }}
