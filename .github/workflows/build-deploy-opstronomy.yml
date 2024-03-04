@@ -34,6 +34,7 @@ jobs:
       run: |
        kubectl set env deployment/my-app HASURA_GRAPHQL_ADMIN_SECRET='opstronomy' HASURA_GRAPHQL_DEV_MODE='true' HASURA_GRAPHQL_ENABLED_LOG_TYPES='startup,http-log' HASURA_GRAPHQL_ENABLE_CONSOLE='true' HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS='true' HASURA_GRAPHQL_METADATA_DATABASE_URL='postgres://test:Opstronomy1234@34.93.127.79:5432/postgres' VAR8='8080'
 
-    - name: Deploy new version to GCP Kubernetes Autopilot
+    - name: Deploy new version to GCP Kubernetes Autopilot latest tag
       run: |
-       kubectl set image deployment/my-app my-app=asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine:latest
+       LATEST_TAG=$(gcloud artifactregistry images list --repository=hasura --location=asia-south1 --format='get(tags)' --sort-by=~timestamp | head -n 1)
+       kubectl set image deployment/my-app my-app=asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine:$LATEST_TAG
