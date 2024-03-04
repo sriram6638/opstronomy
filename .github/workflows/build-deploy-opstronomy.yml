@@ -32,7 +32,7 @@ jobs:
 
     - name: Deploy to GCP Kubernetes Autopilot
       run: |
-       kubectl set deployment my-app --image=asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine     
+       kubectl  deployment my-app --image=${{ secrets.GCP_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REGISTRY_REPOSITORY }}/my-app:${{ github.sha }}     
      
     - name: Deploy to GCP Kubernetes Autopilot env
       run: |
