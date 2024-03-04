@@ -36,5 +36,4 @@ jobs:
 
     - name: Deploy new version to GCP Kubernetes Autopilot latest tag
       run: |
-       LATEST_TAG=$(gcloud artifactregistry images list --repository=hasura --location=asia-south1 --format='get(tags)' --sort-by=~timestamp | head -n 1)
-       kubectl set image deployment/my-app my-app=asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine:$LATEST_TAG
+       kubectl set image deployment/my-app my-app=asia-south1-docker.pkg.dev/practise-414115/hasura/hasura/graphql-engine:latest
