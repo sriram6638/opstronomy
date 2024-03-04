@@ -32,7 +32,7 @@ jobs:
 
     - name: Set environment variables
       run: |
-        kubectl set env deployment/my-app VAR1=${{ secrets.HASURA_GRAPHQL_ADMIN_SECRET }} VAR2=${{ secrets.HASURA_GRAPHQL_DEV_MODE }} VAR3=${{ secrets.HASURA_GRAPHQL_ENABLED_LOG_TYPES }} VAR4=${{ secrets.HASURA_GRAPHQL_ENABLE_CONSOLE }} VAR5=${{ secrets.HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS }} VAR6=${{ secrets.HASURA_GRAPHQL_METADATA_DATABASE_URL }}  VAR8=${{ secrets.PORT }}
+       kubectl set env deployment/my-app HASURA_GRAPHQL_ADMIN_SECRET='opstronomy' HASURA_GRAPHQL_DEV_MODE='true' HASURA_GRAPHQL_ENABLED_LOG_TYPES='startup,http-log' HASURA_GRAPHQL_ENABLE_CONSOLE='true' HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS='true' HASURA_GRAPHQL_METADATA_DATABASE_URL='postgres://test:Opstronomy1234@34.93.127.79:5432/postgres' VAR8='8080'
 
     - name: Deploy new version to GCP Kubernetes Autopilot
       run: |
